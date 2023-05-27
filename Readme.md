@@ -1,3 +1,6 @@
+# Description
+Runs the newman postman collection and sends the results to slack channel.
+
 # Setup
 1. install dependencies using - "npm install"
 2. setup .env file based on env.template
