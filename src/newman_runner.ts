@@ -32,10 +32,15 @@ export class NewmanRunner {
 
     const tenant = channelText.split(" ")[0];
     const environ = channelText.split(" ")[1];
-    http.get(
-      `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
-      (res1:string) => {}
-    );
+
+    const spawn = require('child_process').spawn;
+    spawn('curl ', [`${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`], {
+      detached: true
+    });
+    // http.get(
+    //   `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
+    //   (res1:string) => {}
+    // );
     // axios.get(`${process.env["base_url"]}/run`, {
     //   params: {
     //     tenant: tenant,
@@ -43,7 +48,7 @@ export class NewmanRunner {
     //     response_url:responseURL
     //   }
     // })
-  
+
     res.json({ message: "Your Summary Report with you very soon" });
     // res.redirect(`/run?tenant=${tenant}&env=${environ}`);
   }
