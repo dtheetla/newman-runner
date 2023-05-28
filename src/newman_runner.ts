@@ -33,7 +33,7 @@ export class NewmanRunner {
     const environ = channelText.split(" ")[1];
     http.get(
       `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
-      (res1) => {}
+      (res1:string) => {}
     );
 
     res.json({ message: "Your Summary Report with you very soon" });
