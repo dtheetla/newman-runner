@@ -3,7 +3,7 @@ import newman from "newman";
 import { SlackService } from "./slack_service";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
-const http = require("https");
+import axios from 'axios';
 
 export class NewmanRunner {
   public async ping(req: Request, res: Response) {
@@ -31,11 +31,18 @@ export class NewmanRunner {
 
     const tenant = channelText.split(" ")[0];
     const environ = channelText.split(" ")[1];
-    http.get(
-      `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
-      (res1:string) => {}
-    );
-
+    // http.get(
+    //   `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
+    //   (res1:string) => {}
+    // );
+    axios.get(`${process.env["base_url"]}/run`, {
+      params: {
+        tenant: tenant,
+        env: environ,
+        response_url:responseURL
+      }
+    })
+  
     res.json({ message: "Your Summary Report with you very soon" });
     // res.redirect(`/run?tenant=${tenant}&env=${environ}`);
   }
