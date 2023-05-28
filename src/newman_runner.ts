@@ -3,8 +3,6 @@ import newman from "newman";
 import { SlackService } from "./slack_service";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
-// import axios from 'axios';
-const http = require("http");
 
 export class NewmanRunner {
   public async ping(req: Request, res: Response) {
@@ -33,24 +31,18 @@ export class NewmanRunner {
     const tenant = channelText.split(" ")[0];
     const environ = channelText.split(" ")[1];
 
-    const spawn = require('child_process').spawn;
-    spawn('curl ', [`${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`], {
-      detached: true
-    });
-    // http.get(
-    //   `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
-    //   (res1:string) => {}
-    // );
-    // axios.get(`${process.env["base_url"]}/run`, {
-    //   params: {
-    //     tenant: tenant,
-    //     env: environ,
-    //     response_url:responseURL
-    //   }
-    // })
+    const exec = require('child_process').exec;
+    const args =` "${process.env["base_url_local"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}"`;
+    console.log(args);
+    exec('curl ' + args, function (error: any, stdout:any, stderr:any) {
+      console.log('stdout: ' + stdout);
+      console.log('stderr: ' + stderr);
+      if (error !== null) {
+        console.log('exec error: ' + error);
+      }
+    });     
 
     res.json({ message: "Your Summary Report with you very soon" });
-    // res.redirect(`/run?tenant=${tenant}&env=${environ}`);
   }
 
   public run(req: Request, res: Response) {
