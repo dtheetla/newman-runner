@@ -39,7 +39,7 @@ export class SlackService {
         {
           fallback: "Newman Run Summary",
           title: "Summary Test Result",
-          title_link: `${process.env["results_link"]}?id=${uuid}`,
+          title_link: `${process.env["base_url"]}/results?id=${uuid}`,
           text: `Tenant: ${tenant}\nEnvironment: ${env} \nTotal Run Duration:*${newmanResult.time}`,
           mrkdwn: true,
           fields: [
@@ -74,14 +74,25 @@ export class SlackService {
     };
   }
 
+  public async sendInitSlackMessage(urll: string) {
+    const webhook_url = urll; //process.env["webhook_url"] + "";
+    await axios.post(
+      webhook_url,
+      { text: "Your Summary Report with you very soon" },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
   public async SendReportToSlack(
     result: NewmanRunSummary,
     uuid: string,
     tenant: string,
-    env: string
+    env: string,
+    webhook_url: string
   ) {
     const nresult = this.makeSlackData(result);
-    const webhook_url = process.env["webhook_url"] + "";
     console.log(nresult);
     const data = this.formatMessage(nresult, uuid, tenant, env);
     await axios.post(webhook_url, data, {

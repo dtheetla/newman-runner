@@ -3,6 +3,7 @@ import newman from "newman";
 import { SlackService } from "./slack_service";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+const http = require("https");
 
 export class NewmanRunner {
   public async ping(req: Request, res: Response) {
@@ -15,12 +16,41 @@ export class NewmanRunner {
     res.sendFile(`${process.cwd()}/newman/report-${req.query["id"]}.html`);
   }
 
+  public runpost(req: Request, res: Response) {
+    console.log("req /// ");
+    console.log(req.query);
+    console.log(req.params);
+    console.log(req.body);
+    console.log(req.body.text);
+    console.log("req ///...");
+    // res.json({"message": "Your Summary Report with you very soon"});
+
+    const responseURL = req.body.response_url;
+    const channelText = req.body.text;
+    // slackService.sendInitSlackMessage(responseURL);
+
+    const tenant = channelText.split(" ")[0];
+    const environ = channelText.split(" ")[1];
+    http.get(
+      `${process.env["base_url"]}/run?tenant=${tenant}&env=${environ}&response_url=${responseURL}`,
+      (res1) => {}
+    );
+
+    res.json({ message: "Your Summary Report with you very soon" });
+    // res.redirect(`/run?tenant=${tenant}&env=${environ}`);
+  }
+
   public run(req: Request, res: Response) {
     const uuid = uuidv4();
     const colFilename =
       process.env[req.query["tenant"] + "_" + req.query["env"] + ""];
     const envFilename =
       process.env[req.query["tenant"] + "_" + req.query["env"] + "_env"];
+
+    let responseURL = process.env["webhook_url"] + "";
+    if (req.query["response_url"]) {
+      responseURL = req.query["response_url"] + "";
+    }
 
     const envFile = `${process.env["env_path"]}/${envFilename}`;
     const colFile = `${process.env["col_path"]}/${colFilename}`;
@@ -68,7 +98,8 @@ export class NewmanRunner {
             result,
             uuid,
             req.query["tenant"] + "",
-            req.query["env"] + ""
+            req.query["env"] + "",
+            responseURL
           );
           res.sendFile(`${process.cwd()}/newman/report-${uuid}.html`);
         }
